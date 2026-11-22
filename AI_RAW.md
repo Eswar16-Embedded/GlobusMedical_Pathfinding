@@ -1,220 +1,248 @@
 
-its run but it return no path available and i am not sure
-If your program runs but prints:
 
-No path available.
-that means findPath() returned PathStatus::Unreachable. It doesn't necessarily mean your BFS implementation is wrong.
+Software Candidate Assessment v1.02(3).pdf
+PDF
+review the pdf and explain what i need to build and what i/o are expected and let me know about the imp constrains and dont go with code first explain the problem?
+I reviewed all three pages of your Software Candidate Assessment v1.02. This is a take-home coding challenge to build a pathfinding system for a Real-Time Strategy (RTS) game.
 
-Based on the main.cpp you shared, I would check three things first.
+The main objective is to find a valid route for a battle unit to move from its starting position to a target while avoiding obstacles.
 
-1. Check the starting and target positions
-Your program already prints:
+I'll explain the problem, inputs, outputs, constraints, and expected deliverables without writing code.
 
-Start: (row, col)
-Target: (row, col)
-Confirm that both positions match the intended locations in your JSON map.
+1. What exactly do you need to build?
+Imagine a battlefield divided into a grid of square tiles. Some tiles are open ground, and others are elevated terrain that the unit cannot cross.
 
-2. Check whether tile 0 is causing the problem
-This part of your code is worth investigating:
+Your program must:
 
-else if (tile == 3 || tile == 0) {
-    grid[row][col] = 3;
-}
+Read a battlefield map.
 
-You're treating both 3 and 0 as blocked.
+Identify the battle unit's starting position.
 
-The assessment explicitly identifies 3 as elevated terrain, but it doesn't define 0.
+Identify its target destination.
 
-If your JSON contains many zero-valued tiles that are actually traversable, your program could incorrectly block a valid route.
+Find a valid route that avoids elevated terrain.
 
-Don't change 0 to ground yet. First, verify what it represents in your actual JSON file.
+Return the sequence of positions the unit should follow.
 
-3. Print the battlefield to debug it
-Temporarily add this code immediately before calling findPath():
+Example battlefield (illustrative)
 
-std::cout << "\nBattlefield:\n";
 
-for (int row = 0; row < height; ++row) {
-    for (int col = 0; col < width; ++col) {
+Example only, not the map supplied with the assessment. The unit must navigate around blocked tiles.
+2. What inputs are expected?
+The assessment specifies three main inputs.
 
-        if (row == start.row && col == start.col)
-            std::cout << "S ";
-        else if (row == target.row && col == target.col)
-            std::cout << "T ";
-        else if (grid[row][col] == 3)
-            std::cout << "# ";
-        else
-            std::cout << ". ";
-    }
-    std::cout << '\n';
-}
+Input
 
-The output will show:
+Description
 
-S — Starting position
+Battlefield map
 
-T — Target position
+A grid containing at least 32 × 32 positions
 
-# — Blocked terrain
+Starting position
 
-. — Traversable ground
+Where the battle unit begins
 
-This will help identify whether the target is genuinely unreachable.
+Target position
 
-What I need from you
-Please share your pathfinder.cpp code and take_home_project.json file.
+Where the unit needs to go
 
-I can then check whether:
+The program must support JSON files compatible with the RiskyLab Tilemap Editor.
 
-BFS is exploring the correct neighbors.
+JSON tile values
+Value
 
-The JSON tiles are being interpreted correctly.
+Meaning
 
-The target is actually reachable.
+Traversable?
 
-There is a bug in the pathfinding logic.
+-1
 
-We should identify the actual cause before modifying the algorithm.
+Empty ground
 
-suggest like best ways to debug wirhout changing the alg
-Since your C++17 BFS program runs but returns No path available, I would debug the input and trace the BFS execution without changing the algorithm.
+Yes
 
-Here is the approach I would follow.
+3
 
-1. Verify the input first
-Before debugging BFS, confirm that the battlefield is being loaded correctly.
+Elevated terrain / obstacle
 
-Print the starting and target coordinates.
+No
 
-Count how many tiles are traversable (-1) and blocked (3).
+8.3
 
-Check how many tiles have the JSON value 0.
+Battle unit starting position
 
-Confirm that the grid contains 32 rows and 32 columns.
+Starting tile
 
-Verify that start and target are inside the grid.
+0.5
 
-Important: Your current loader treats 0 as blocked. Check whether this matches the actual JSON map before changing anything.
+Target destination
 
-2. Print a simple battlefield visualization
-Use temporary debug output:
+Target tile
 
-for (int row = 0; row < height; ++row) {
-    for (int col = 0; col < width; ++col) {
-        if (row == start.row && col == start.col)
-            std::cout << "S ";
-        else if (row == target.row && col == target.col)
-            std::cout << "T ";
-        else if (grid[row][col] == 3)
-            std::cout << "# ";
-        else
-            std::cout << ". ";
-    }
-    std::cout << '\n';
-}
+For example, conceptually a small map might look like this:
 
-This helps you see whether obstacles surround the target or disconnect the battlefield.
+ 8.3   -1   -1    3
+  -1    3   -1    3
+  -1   -1   -1   -1
+   3    3   -1   0.5
+This is just a simplified representation of the tile values, not the complete RiskyLab JSON structure.
 
-3. Trace the BFS queue
-Add temporary logging inside pathfinder.cpp without modifying the search logic.
+Important: Your program should read the actual JSON map format rather than assume the map is simply a two-dimensional array.
 
-For example, immediately after removing a position from the queue:
-
-std::cout << "Exploring: ("
-          << current.row << ", "
-          << current.col << ")\n";
-
-Use your existing variable name if it differs from current.
-
-Observe whether BFS explores multiple positions or stops after only a few.
-
-If it stops early, investigate why neighboring positions are being rejected.
-
-4. Check why neighbors are rejected
-For a few iterations, log whether each neighboring tile is:
-
-Outside the battlefield.
-
-Blocked by elevated terrain.
-
-Already visited.
-
-Valid for exploration.
-
-This is particularly useful when the start has apparently open tiles around it but BFS doesn't explore them.
-
-5. Use a small controlled test
-Temporarily test findPath() directly with a small grid containing no obstacles.
+3. What output is expected?
+The required output is a list of positions from the starting tile to the target tile.
 
 For example:
 
-S . . .
-. . . .
-. . . T
-The expected shortest path is 5 moves.
+Path found!
 
-If BFS finds this path, the basic algorithm is likely functioning.
+(0, 0)
+(1, 0)
+(2, 0)
+(2, 1)
+(2, 2)
+(3, 2)
+(3, 3)
+Each coordinate represents one grid position.
 
-Then introduce one obstacle, followed by a wall with a gap. This helps distinguish a BFS implementation issue from a JSON interpretation issue.
+The assessment doesn't prescribe the exact output format, so a JSON list of coordinates or a readable console output can be suitable. Including both would make the results easier to inspect.
 
-6. Use debugger breakpoints
-Since you're using C++17, you can debug with GDB or your IDE's debugger.
+A useful implementation should also report when no valid route exists, although the PDF doesn't specify the exact wording or structure for that case.
 
-Useful breakpoint locations are:
+4. Important constraints
+These are the most important rules from the assessment.
 
-Breakpoint
+Minimum map size: 32 × 32
 
-What to inspect
+Your program must handle a battlefield with at least 1,024 tiles. It can support larger maps as well.
 
-After JSON loading
+Only four movement directions
 
-Grid values, start, target
+Left, right, up, and down are allowed. Diagonal movement is not permitted.
 
-Before calling findPath()
+One tile per step
 
-Correct input passed to BFS
+Movement is discrete. A unit must move from one complete tile to an adjacent tile and cannot occupy a fraction of a tile.
 
-At the beginning of BFS
+Elevated terrain is blocked
 
-Initial queue and visited state
+The unit cannot travel through any tile represented by 3.
 
-Inside the neighbor loop
+RiskyLab JSON compatibility
 
-Why neighbors are accepted or rejected
+The program must support maps exported from the RiskyLab Tilemap Editor.
 
-Before returning Unreachable
+5. Which algorithm should you use?
+The PDF does not require a specific pathfinding algorithm. It asks for an efficient, accurate solution.
 
-Queue state and number of visited tiles
+Two reasonable options are:
 
-You can also compile with debugging symbols:
+Algorithm
 
-g++ -std=c++17 -g -O0 -Wall -Wextra -pedantic src/main.cpp src/pathfinder.cpp -o pathfinder
+Why consider it?
 
-Include any other source files your project requires.
+Breadth-First Search (BFS)
 
-Recommended debugging order
+Simple and guarantees a shortest path when every move has equal cost
 
-Verify JSON tile values and dimensions
+A* Search
 
-Print start and target coordinates
+Uses a heuristic to guide the search toward the target, often exploring fewer tiles
 
-Visualize the battlefield
+My recommendation: BFS is a strong starting choice for this assessment because the movement rules are simple and each step has equal cost. A* is also appropriate, particularly if you want to demonstrate heuristic pathfinding.
 
-Trace BFS queue processing
+The PDF asks for a valid path, not explicitly the shortest path. However, returning a shortest path is a useful quality goal.
 
-Inspect neighbor rejection reasons
+6. Important edge cases
+Although not all of these are explicitly listed in the PDF, they are important for a reliable implementation.
 
-Run a simple controlled test
-0 of 6 completed
+The target is completely surrounded by elevated terrain.
 
-How I would approach this as a developer
-I would first confirm whether the issue comes from map loading, terrain interpretation, or BFS traversal. I wouldn't modify the algorithm until I had evidence showing where the behavior differs from expectations.
+The start and target are the same position.
 
-A useful debugging question to ask yourself is:
+The starting or target coordinates are outside the map.
 
-"Is BFS unable to find a path because the target is genuinely unreachable, or because my program is interpreting the battlefield incorrectly?"
+The JSON is malformed or contains missing information.
 
-That distinction should guide your next debugging step.
+The map contains no valid path.
+
+The path runs along the map boundary.
+
+The map is larger than 32 × 32.
+
+A professional solution should handle these situations predictably rather than crash.
+
+7. Optional extra task
+The PDF includes an optional extension: multiple units moving simultaneously.
+
+In that version, several units may move toward one common target or different targets, but no two units can occupy the same ground tile at the same time.
+
+This introduces collision avoidance and movement coordination. It is more complex than single-unit pathfinding.
+
+I would complete and test the single-unit implementation first. The multi-unit feature is optional and should not compromise the required functionality.
+
+8. What do you need to submit?
+The PDF requests a public Git repository, such as GitHub or GitLab.
+
+Your repository should contain:
+
+Deliverable
+
+Expected content
+
+Source code
+
+Complete working implementation
+
+README.md
+
+Design decisions, project structure, build and execution instructions
+
+Sample inputs
+
+Example battlefield maps, preferably RiskyLab-compatible JSON
+
+Sample outputs
+
+Resulting paths for several test scenarios
+
+Screenshots
+
+Evidence showing the project working
+
+Build instructions
+
+Enough detail for another engineer to compile and run the project
+
+Tests
+
+Appropriate checks for functionality and edge cases
+
+The PDF estimates 3–6 hours for the task and says you should use the programming language and technologies agreed upon when the project was assigned.
+
+9. How will they evaluate your submission?
+The assessment explicitly evaluates code organization, readability, maintainability, algorithm efficiency and accuracy, edge-case handling, documentation, completeness, third-party library usage, and project setup. UI quality is considered only if a user interface is applicable.
+
+This means the interviewer is evaluating more than whether the algorithm finds a path. They also want to see how you structure a small software project and explain your engineering decisions.
+
+10. Suggested implementation plan — without code
+Understand the JSON map format. Inspect the sample file linked by the assessment and identify how tile values and grid dimensions are stored.
+
+Define the input and output behavior. Decide how the user supplies a map and how the resulting path will be displayed or saved.
+
+Design the pathfinding logic. Determine how to identify valid neighbors, track visited tiles, and reconstruct a path.
+
+Plan error handling. Decide what happens with invalid coordinates, blocked destinations, malformed JSON, or unreachable targets.
+
+Define test cases. Include a clear path, a route around obstacles, and an unreachable destination.
+
+Plan the repository. Separate the algorithm, JSON handling, tests, sample data, and documentation.
+
+One important distinction
+Your assignment is to build a pathfinding algorithm, not a complete RTS game. You do not need game graphics, combat systems, animation, or a full game engine. A command-line program is a reasonable design, provided it meets the required inputs, outputs, and submission requirements.
+
+Before we begin coding, the first technical decision is whether to use BFS or A* and how to structure the JSON input handling. We can work through those decisions and the overall architecture first, then implement each component separately.
 
 
 
