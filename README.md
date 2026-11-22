@@ -10,20 +10,20 @@ Battle units can move horizontally or vertically and cannot travel through eleva
 
 ## Project Structure
 
+
 ```text
 GlobusMedical_Pathfinding/
-│
-├── src/
-│   ├── main.cpp
-│   ├── pathfinder.cpp
-│   ├── pathfinder.h
-│   └── include/
-│       └── json.hpp
-│
+├── main.cpp
+├── pathfinder.cpp
+├── pathfinder.h
+├── test_pathfinder.cpp
+├── json.hpp
 ├── take_home_project.json
 ├── sample_output.txt
+├── reachable_test_output.txt
 └── README.md
 ```
+
 
 ## Algorithm
 
@@ -83,7 +83,7 @@ Starting and target tiles are treated as traversable positions during pathfindin
 From the project root directory:
 
 ```powershell
-g++ -std=c++17 -Wall -Wextra -pedantic src/main.cpp src/pathfinder.cpp -o main.exe
+g++ -std=c++17 -Wall -Wextra -pedantic main.cpp pathfinder.cpp -o main.exe
 ```
 
 ### Run
